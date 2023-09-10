@@ -1,0 +1,316 @@
+<!doctype html>
+
+<div class="w3-container w3-margin" xmlns:>
+    <!--<div class="container" xmlns:  style="background-image: url(images/dallas.jpg)">-->
+    <div>
+        <a class="btn btn-sm btn-link"
+           href="{{inputModelUrl}}" target="_self">
+            Go to Inputs
+        </a>
+
+        <a class="btn btn-sm btn-link"
+           href="{{toPmModelUrl}}" target="_self">
+            Go to PM model
+        </a>
+    </div>
+
+    <div>
+        <button id="hideInputs" ng-click="hideShowInputsFn()"
+                ng-class="hideInputs ? 'btn btn-primary' : 'btn btn-danger'">
+            {{showHideInputsText()}} Inputs
+        </button>
+
+        <button id="optimizeLineUps" ng-click="optimizeLineUps()"
+                ng-class="'btn btn-primary'">
+            Optimize lineups
+        </button>
+    </div>
+    <br>
+    <div class="col-md-6" ng-hide="hideInputs">
+
+        <button id="udpatePlayers" ng-click="updateData()"
+                ng-class="'btn btn-primary'">
+            Update Data
+        </button>
+
+
+        <br>
+        <br>
+        <button id="hideShowPgs" ng-click="showHidPgs()" ng-class="shouldHidePgs ? 'btn btn-danger' : 'btn btn-primary'"
+                ng-class="'btn btn-primary'">
+            {{showHideText('pg')}} PGs
+        </button>
+        <button id="hideShowSgs" ng-click="showHidSgs()" ng-class="shouldHideSgs ? 'btn btn-danger' : 'btn btn-primary'"
+                ng-class="'btn btn-primary'">
+            {{showHideText('sg')}} SGs
+        </button>
+        <button id="hideShowSfs" ng-click="showHidSfs()" ng-class="shouldHideSfs ? 'btn btn-danger' : 'btn btn-primary'"
+                ng-class="'btn btn-primary'">
+            {{showHideText('sf')}} SFs
+        </button>
+        <button id="hideShowPfs" ng-click="showHidPfs()" ng-class="shouldHidePfs ? 'btn btn-danger' : 'btn btn-primary'"
+                ng-class="'btn btn-primary'">
+            {{showHideText('pf')}} PFs
+        </button>
+        <button id="hideShowCs" ng-click="showHidCs()" ng-class="shouldHideCs ? 'btn btn-danger' : 'btn btn-primary'"
+                ng-class="'btn btn-primary'">
+            {{showHideText('c')}} Cs
+        </button>
+
+        <table class="table table-bordered">
+
+            <thead>
+            <tr>
+                <th>Should Include</th>
+                <th>Should Exclude</th>
+                <th>Name</th>
+                <th>Position</th>
+                <th>Salary</th>
+                <th>Exp points fd</th>
+                <th>Exp points daily fd</th>
+                <th>Exp points model</th>
+            </tr>
+            </thead>
+
+            <tbody ng-repeat="player in fdPlayers">
+            <tr>
+                <td ng-hide=shouldHidePlayer(player.position)>
+                    <input type="checkbox" ng-model="player.shouldInclude">
+                </td>
+                <td ng-hide=shouldHidePlayer(player.position)>
+                    <input type="checkbox" ng-model="player.shouldExclude">
+                </td>
+                <td ng-hide=shouldHidePlayer(player.position)>
+                    {{player.name}}
+                </td>
+
+                <td ng-hide=shouldHidePlayer(player.position)>
+                    {{player.position}}
+                </td>
+                <td ng-hide=shouldHidePlayer(player.position)>
+                    <input type="number" ng-model="player.salary" step="1">
+                </td>
+                <td ng-hide=shouldHidePlayer(player.position)>
+                    <input type="number" ng-model="player.expPoints" step="0.01">
+                </td>
+                <td ng-hide=shouldHidePlayer(player.position)>
+                    <input type="number" ng-model="player.dailyFantasyProj" step="0.01">
+                </td>
+                <td ng-hide=shouldHidePlayer(player.position)>
+                    <input type="number" ng-model="player.modelExpPoints" step="0.01">
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+    <div class="col-md-6">
+
+
+        <table class="table table-bordered">
+
+            <br>
+            <thead>
+            <tr>
+                <th>Event</th>
+                <th>Match Spread</th>
+                <th>Total Points</th>
+                <th>Desired Diff</th>
+
+            </tr>
+            </thead>
+            <tbody ng-repeat="(key, value) in dayEvents">
+            <tr>
+                <td>
+                    {{key}}
+                </td>
+                <td>
+                    <input type="number" ng-model="value.matchSpread" step="0.25">
+                </td>
+                <td>
+                    <input type="number" ng-model="value.totalPoints" step="0.25">
+                </td>
+                <td>
+                    <input type="number" ng-model="value.homeDesiredScoreDiff" step="1">
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+        <br>
+        <strong>Team Sums</strong>
+        <table class="table table-bordered">
+
+            <br>
+            <br>
+            <thead>
+            <tr>
+                <th>Time</th>
+                <th>Event</th>
+                <th>Sums</th>
+
+            </tr>
+            </thead>
+            <tbody ng-repeat="(key, value) in playersSum">
+            <tr>
+                <td>
+                    {{value.Time}}
+                </td>
+                <td>
+                    {{key}}
+                </td>
+                <td>
+                    {{value.Sum}}
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+        <br>
+        <br>
+
+
+        <br>
+        <br>
+        <button id="generateCsv" ng-click="generateCsv()"
+                ng-class="'btn btn-primary'">
+            Generate Csv
+        </button>
+        <br>
+        <br>
+        <strong>Lineups Chosen {{lineUpsChosen.length}}</strong>
+
+        <table class="table table-bordered">
+
+            <thead>
+            <tr>
+                <th>PG1</th>
+                <th>PG2</th>
+                <th>SG1</th>
+                <th>SG2</th>
+                <th>SF1</th>
+                <th>SF2</th>
+                <th>PF1</th>
+                <th>PF2</th>
+                <th>C</th>
+                <th>Salary</th>
+                <th>Exp Points</th>
+                <th>Remove</th>
+            </tr>
+            </thead>
+            <tbody ng-repeat="player in lineUpsChosen track by $index">
+            <tr>
+                <td>
+                    {{player.firstPg}}
+                </td>
+                <td>
+                    {{player.secondPg}}
+                </td>
+                <td>
+                    {{player.firstSg}}
+                </td>
+                <td>
+                    {{player.secondSg}}
+                </td>
+                <td>
+                    {{player.firstSf}}
+                </td>
+                <td>
+                    {{player.secondSf}}
+                </td>
+                <td>
+                    {{player.firstPf}}
+                </td>
+                <td>
+                    {{player.secondPf}}
+                </td>
+                <td>
+                    {{player.center}}
+                </td>
+                <td>
+                    {{player.totalSalary}}
+                </td>
+                <td>
+                    {{player.totalModelExpPoints}}
+                </td>
+                <td>
+                    <button id="removeLineUp" ng-click="removeLineUp(player)"
+                            ng-class="'btn btn-primary'">
+                        Remove
+                    </button>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+
+        <strong>Optimized Lineups</strong>
+        <table class="table table-bordered">
+
+            <thead>
+            <tr>
+                <th>PG1</th>
+                <th>PG2</th>
+                <th>SG1</th>
+                <th>SG2</th>
+                <th>SF1</th>
+                <th>SF2</th>
+                <th>PF1</th>
+                <th>PF2</th>
+                <th>C</th>
+                <th>Salary</th>
+                <th>Exp Points</th>
+                <th>Add Lineup</th>
+            </tr>
+            </thead>
+            <tbody ng-repeat="player in optimizedLineups">
+            <tr>
+                <td>
+                    {{player.firstPg}}
+                </td>
+                <td>
+                    {{player.secondPg}}
+                </td>
+                <td>
+                    {{player.firstSg}}
+                </td>
+                <td>
+                    {{player.secondSg}}
+                </td>
+                <td>
+                    {{player.firstSf}}
+                </td>
+                <td>
+                    {{player.secondSf}}
+                </td>
+                <td>
+                    {{player.firstPf}}
+                </td>
+                <td>
+                    {{player.secondPf}}
+                </td>
+                <td>
+                    {{player.center}}
+                </td>
+                <td>
+                    {{player.totalSalary}}
+                </td>
+                <td>
+                    {{player.totalModelExpPoints}}
+                </td>
+                <td>
+                    <button id="addLineUp" ng-click="addLineUp(player)"
+                            ng-class="'btn btn-primary'">
+                         Add
+                    </button>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+</div>

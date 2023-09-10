@@ -1,0 +1,82 @@
+"","Name","Salary","Team","Position","Opp","IsHome","PMIN","Points","Ceil","Floor"
+"1","Will Barton",4500,"WAS","SG\/SF}","MEM","UNKNOWN",32,27.59,37.75,17.91
+"2","Jarrett Allen",6800,"CLE","C\/PF}","LAL","UNKNOWN",33,36.78,46.83,26.97
+"3","Scottie Barnes",7100,"TOR","PF\/SF}","CHI","UNKNOWN",38,38.15,49.22,28
+"4","Kyle Kuzma",6200,"WAS","SF\/PF}","MEM","UNKNOWN",32,32.7,43.21,23.12
+"5","Gary Trent Jr.",6000,"TOR","SG\/SF}","CHI","UNKNOWN",36,31.43,43.85,21.54
+"6","Norman Powell",4300,"LAC","SF\/SG}","UTA","UNKNOWN",26,22.13,31.54,14.19
+"7","Fred VanVleet",7500,"TOR","PG}","CHI","UNKNOWN",36,38.44,51.69,26.44
+"8","Precious Achiuwa",4500,"TOR","PF\/C}","CHI","UNKNOWN",26,22.97,32.4,15.69
+"9","Kristaps Porzingis",8600,"WAS","C\/PF}","MEM","UNKNOWN",32,43.88,56.48,32.02
+"10","Darius Garland",7900,"CLE","SG\/PG}","LAL","UNKNOWN",35,40.07,53.51,29.01
+"11","Reggie Jackson",4700,"LAC","PG}","UTA","UNKNOWN",33,23.8,33.18,15.84
+"12","Mike Conley",5900,"UTA","PG}","LAC","UNKNOWN",32,29.79,41.4,20.2
+"13","Marcus Morris",5700,"LAC","PF\/SF}","UTA","UNKNOWN",33,28.36,38.63,18.83
+"14","Evan Mobley",6600,"CLE","PF\/C}","LAL","UNKNOWN",33,32.69,42.7,22.96
+"15","Jarred Vanderbilt",5800,"UTA","PF}","LAC","UNKNOWN",26,28.08,38.2,19.45
+"16","Patrick Williams",4100,"CHI","SF\/PF}","TOR","UNKNOWN",31,19.86,27.92,11.82
+"17","LeBron James",10000,"LAL","SF\/PF}","CLE","UNKNOWN",37,48.33,61.34,36.54
+"18","Jordan Clarkson",6700,"UTA","PG\/SG}","LAC","UNKNOWN",32,32.12,44.57,22.14
+"19","Steven Adams",5800,"MEM","C}","WAS","UNKNOWN",26,27.45,37.93,19.94
+"20","Caris LeVert",6500,"CLE","SG\/SF}","LAL","UNKNOWN",35,30.71,40.87,21.28
+"21","Collin Sexton",5000,"UTA","SG}","LAC","UNKNOWN",28,23.47,32.91,15.24
+"22","Paul George",9000,"LAC","SG\/SF}","UTA","UNKNOWN",35,42.2,54.92,30.66
+"23","Desmond Bane",8100,"MEM","SG\/SF}","WAS","UNKNOWN",34,37.89,51.09,26.87
+"24","Kelly Olynyk",5500,"UTA","C\/PF}","LAC","UNKNOWN",26,25.6,35.04,17.37
+"25","Dillon Brooks",5600,"MEM","SG\/SF}","WAS","UNKNOWN",29,25.9,36.93,17.18
+"26","Donovan Mitchell",9600,"CLE","SG\/PG}","LAL","UNKNOWN",37,44.02,56.16,32.1
+"27","Zach LaVine",7100,"CHI","SG\/SF}","TOR","UNKNOWN",34,32.39,44.54,22.86
+"28","Monte Morris",5300,"WAS","PG}","MEM","UNKNOWN",30,23.95,34.68,15.97
+"29","Anthony Davis",10600,"LAL","PF\/C}","CLE","UNKNOWN",35,46.92,60.68,36.29
+"30","John Wall",5400,"LAC","PG\/SG}","UTA","UNKNOWN",22,23.76,32.88,15.36
+"31","OG Anunoby",7800,"TOR","SF\/SG}","CHI","UNKNOWN",38,33.63,45.81,23.88
+"32","Ja Morant",9900,"MEM","PG}","WAS","UNKNOWN",34,42.59,54.96,32.12
+"33","Patrick Beverley",4800,"LAL","PG\/SG}","CLE","UNKNOWN",28,20.58,29.69,13.1
+"34","Nikola Vucevic",8200,"CHI","C}","TOR","UNKNOWN",32,34.77,44.96,24.6
+"35","Lauri Markkanen",8500,"UTA","PF\/SF}","LAC","UNKNOWN",32,35.82,47.21,24.43
+"36","Deni Avdija",3900,"WAS","SF\/PF}","MEM","UNKNOWN",22,16.29,24.56,9.57
+"37","Ivica Zubac",7000,"LAC","C}","UTA","UNKNOWN",29,29.05,38.16,20.68
+"38","Santi Aldama",4600,"MEM","PF}","WAS","UNKNOWN",29,19.04,27.2,11.87
+"39","Ayo Dosunmu",5400,"CHI","PG\/SG}","TOR","UNKNOWN",32,22.18,32.4,14.21
+"40","Troy Brown Jr.",4600,"LAL","SF}","CLE","UNKNOWN",25,18.75,27.38,11.35
+"41","Chris Boucher",5900,"TOR","C\/PF}","CHI","UNKNOWN",22,23.66,33.69,15.69
+"42","Russell Westbrook",7400,"LAL","PG}","CLE","UNKNOWN",30,29.42,39.3,20.9
+"43","DeMar DeRozan",9400,"CHI","SG\/SF}","TOR","UNKNOWN",35,36.77,47.03,26.74
+"44","Christian Koloko",4000,"TOR","C}","CHI","UNKNOWN",16,15.39,22.34,9.43
+"45","Javonte Green",4100,"CHI","SG\/SF}","TOR","UNKNOWN",20,15.69,23.93,9.04
+"46","Rui Hachimura",5100,"WAS","SF\/PF}","MEM","UNKNOWN",22,19.49,28.5,11.45
+"47","Tyus Jones",5400,"MEM","PG}","WAS","UNKNOWN",23,20.2,29.8,11.84
+"48","Brandon Clarke",4300,"MEM","PF\/C}","WAS","UNKNOWN",16,16.1,23.49,9.77
+"49","Nicolas Batum",3800,"LAC","SF\/PF}","UTA","UNKNOWN",19,14.16,22.4,7.47
+"50","Anthony Gill",3900,"WAS","PF}","MEM","UNKNOWN",22,14.5,22.03,8.54
+"51","Otto Porter Jr.",4400,"TOR","SF\/PF}","CHI","UNKNOWN",20,16.34,24.9,10.12
+"52","Alex Caruso",4600,"CHI","PG\/SG}","TOR","UNKNOWN",25,17,24.5,10
+"53","Lonnie Walker IV",5900,"LAL","SG\/SF}","CLE","UNKNOWN",30,21.81,32.61,13.09
+"54","John Konchar",4600,"MEM","SF\/SG}","WAS","UNKNOWN",23,16.96,24.55,9.37
+"55","Dean Wade",4200,"CLE","PF\/SF}","LAL","UNKNOWN",24,15.04,23.56,8.27
+"56","Corey Kispert",3700,"WAS","SF}","MEM","UNKNOWN",22,13.13,21.15,6.32
+"57","Malik Beasley",4700,"UTA","SF\/SG}","LAC","UNKNOWN",22,16.65,24.85,8.93
+"58","David Roddy",4000,"MEM","PF}","WAS","UNKNOWN",19,14.11,20.91,7.81
+"59","Jordan Goodwin",3500,"WAS","PG}","MEM","UNKNOWN",16,11.69,17.89,6.92
+"60","Kevin Love",5600,"CLE","PF\/C}","LAL","UNKNOWN",15,18.35,26.71,10.96
+"61","Talen Horton-Tucker",4400,"UTA","SG\/SF}","LAC","UNKNOWN",16,13.66,21.13,7.47
+"62","Robert Covington",4600,"LAC","PF\/SF}","UTA","UNKNOWN",15,13.6,21.45,7.06
+"63","Goran Dragic",4200,"CHI","PG}","TOR","UNKNOWN",16,11.79,18.16,6.13
+"64","Derrick Jones Jr.",3900,"CHI","SF\/PF}","TOR","UNKNOWN",15,10.85,17.66,5.55
+"65","Austin Reaves",4400,"LAL","SF\/SG}","CLE","UNKNOWN",20,11.5,18.02,6.23
+"66","Daniel Gafford",3700,"WAS","C}","MEM","UNKNOWN",10,9.27,15.45,4.38
+"67","Amir Coffey",3700,"LAC","SF\/SG}","UTA","UNKNOWN",15,9.27,16.42,4.21
+"68","Cedi Osman",4200,"CLE","SF\/PF}","LAL","UNKNOWN",13,9.99,16.37,4.57
+"69","Matt Ryan",3500,"LAL","SF}","CLE","UNKNOWN",11,8.18,15.12,2.48
+"70","Rudy Gay",4000,"UTA","PF\/SF}","LAC","UNKNOWN",12,9.29,15.4,4.16
+"71","Terance Mann",4000,"LAC","SG\/SF}","UTA","UNKNOWN",13,8.92,14.89,4.21
+"72","Wenyen Gabriel",4000,"LAL","PF}","CLE","UNKNOWN",11,8.25,13.1,3.88
+"73","Juan Toscano-Anderson",3700,"LAL","PF}","CLE","UNKNOWN",13,7.34,12.58,2.88
+"74","Walker Kessler",4300,"UTA","C}","LAC","UNKNOWN",10,8.39,14.42,3.93
+"75","Isaac Okoro",3600,"CLE","SF\/SG}","LAL","UNKNOWN",10,4.58,9.43,1.35
+"76","Thaddeus Young",3800,"TOR","PF}","CHI","UNKNOWN",4,3.79,7.85,1.08
+"77","Robin Lopez",3600,"CLE","C}","LAL","UNKNOWN",5,3.48,7.5,0
+"78","Dalano Banton",3600,"TOR","PG}","CHI","UNKNOWN",4,3.31,6.87,0.48
+"79","Nickeil Alexander-Walker",4100,"UTA","SG\/SF}","LAC","UNKNOWN",4,3.16,7.37,0
+"80","Jake LaRavia",3900,"MEM","PF}","WAS","UNKNOWN",4,2.98,7.75,0
+"81","Xavier Tillman Sr.",3800,"MEM","PF}","WAS","UNKNOWN",3,2.49,6.85,0

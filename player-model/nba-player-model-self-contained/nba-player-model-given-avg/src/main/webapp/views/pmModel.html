@@ -1,0 +1,423 @@
+<!doctype html>
+
+<div class="container" xmlns:>
+    <!--<div class="container" xmlns:  style="background-image: url(images/dallas.jpg)">-->
+    <div>
+        <a class="btn btn-sm btn-link"
+           href="{{inputModelUrl}}" target="_self">
+            Go to Inputs
+        </a>
+
+        <a class="btn btn-sm btn-link"
+           href="{{toFdModelFromPmModelUrl}}" target="_self">
+            Go to Fan Duel
+        </a>
+    </div>
+
+    <div class="col-sm-6">
+        <strong>SELECT EVENT</strong>
+        <br>
+        <select ng-class="dropdown" ng-model="selectedEvent" style="width:50%;max-width:50%;"
+                ng-options="key  for (key, value) in dayEvents"
+                ng-change="loadEventData(selectedEvent)"></select>
+
+
+    </div>
+
+    <br>
+    <br>
+    <br>
+    <div ng-hide="selectedEvent == null">
+
+        <div class="col-md-6">
+            <table class="table table-bordered">
+
+                <thead>
+                <tr>
+                    <th>Match Spread</th>
+                    <th>Total Points</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th>
+                        <input type="number" ng-model="selectedEvent.matchSpread" step="0.1">
+                    </th>
+                    <th>
+                        <input type="number" ng-model="selectedEvent.totalPoints" step="0.1">
+                    </th>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <br>
+
+        <div class="row">
+
+        </div>
+        <button id="hideShowInputs" ng-click="switchHideVariable()"
+                ng-class="'btn btn-primary'">
+            {{hideOrShow()}} Inputs
+        </button>
+
+        <button ng-click="runModel()"
+                ng-class="'btn btn-primary'">
+            Generate for ticked Players
+        </button>
+
+        <button ng-click="runModel()"
+                ng-class="'btn btn-primary'">
+            Generate for All Players
+        </button>
+
+        <button ng-click="runAllGames()"
+                ng-class="'btn btn-primary'">
+            Generate for All Events
+        </button>
+
+        <button ng-click="loadCachedMap()"
+                ng-class="'btn btn-primary'">
+            Load map
+        </button>
+<!--        <button id="resetPlayers" ng-click="updateData()"-->
+<!--                ng-class="'btn btn-primary'">-->
+<!--            Reset Players-->
+<!--        </button>-->
+        <br>
+        <br>
+        <div class="row">
+            <table class="table table-bordered">
+                <strong>
+                    {{selectedEvent.homeTeamName}}
+                </strong>
+                <br>
+                <br>
+                <thead>
+                <tr>
+                    <th width="5%">Starter</th>
+                    <th width="5%">Position</th>
+                    <th width="10%">Name</th>
+                    <th ng-hide="hideInputs">Pmin</th>
+                    <th ng-hide="hideInputs">Average Minutes</th>
+                    <th ng-hide="hideInputs">Cum Perc Attempted Per Minute</th>
+                    <th ng-hide="hideInputs">Last Year Two Perc</th>
+                    <th ng-hide="hideInputs">Cum Two Perc In Season</th>
+                    <th ng-hide="hideInputs">Last Year Three Perc</th>
+                    <th ng-hide="hideInputs">Cum Three Perc In Season</th>
+                    <th ng-hide="hideInputs">Last Year Three Prop</th>
+                    <th ng-hide="hideInputs">Cum Three Prop</th>
+                    <th ng-hide="hideInputs">Cum Ft Made Per Fg Attempted</th>
+                    <th ng-hide="hideInputs">Last Year Ft Perc</th>
+                    <th ng-hide="hideInputs">Cum Ft Perc</th>
+                    <th width="5%">Target Prediction</th>
+                    <th width="5%">Avg Prediction</th>
+                    <th width="5%">Line</th>
+                    <th width="5%">Over Prob</th>
+                    <th width="5%">Under Or Equal Price</th>
+                    <th width="5%">Over Price</th>
+                    <th width="5%">Three Points Line</th>
+                    <th width="5%">Over Prob</th>
+                    <th width="5%">Over Price</th>
+                    <th width="5%">Under Or Equal Price</th>
+                    <th width="5%">Generate Prices</th>
+                </tr>
+                </thead>
+                <tbody ng-repeat="player in homePlayers">
+                <tr>
+                    <td>
+                        <select ng-model="player.isStarter">
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </td>
+                    <td>
+                        {{player.position}}
+                    </td>
+                    <td>
+                        {{player.name}}
+                    </td>
+
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.pmin" step="0.5">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.averageMinutes" step="0.01">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.cumPercAttemptedPerMinute" step="0.0001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.lastYearTwoPerc" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.cumTwoPerc" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.lastYearThreePerc" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.cumThreePerc" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.lastYearThreeProp" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.cumThreeProp" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.cumFtMadePerFgAttempted" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.lastYearFtPerc" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.cumFtPerc" step="0.001">
+                    </td>
+                    <td>
+                        <input type="number" ng-model="player.targetAverage" step="0.001">
+                    </td>
+                    <td>
+                        {{getPlayerAverage(player)}}
+                    </td>
+                    <td>
+                        <input type="number" ng-model="player.line" step="0.5" max="50.5" , min="0.5">
+                    </td>
+                    <td>
+                        {{roundNumber(getOverProbForPlayer(player))}}
+                    </td>
+                    <td>
+                        {{roundNumber(1 / (1 - getOverProbForPlayer(player)))}}
+                    </td>
+                    `
+                    <td>
+                        {{roundNumber(1 / getOverProbForPlayer(player))}}
+                    </td>
+                    <td>
+                        <input type="number" ng-model="player.threePointsLine" step="0.5" max="50.5" , min="0.5">
+                    </td>
+                    <td>
+                        {{roundNumber(getThreePointersOverProbForPlayer(player))}}
+                    </td>
+                    <td>
+                        {{roundNumber(1 / getThreePointersOverProbForPlayer(player))}}
+                    </td>
+                    <td>
+                        {{roundNumber(1 / (1 - getThreePointersOverProbForPlayer(player)))}}
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="player.generatePrices">
+                    </td>
+                    <td>
+                        <button id="hideShowInputs2" ng-click="generatePredictionsForPlayer(player)"
+                                ng-class="'btn btn-primary'">
+                            Generate predictions
+                        </button>
+                    </td>
+
+                </tr>
+
+                </tbody>
+                <tbody>
+                <tr>
+
+                    <td>
+
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <strong>
+                            {{getExpPminSum(homePlayers)}}
+                        </strong>
+                    </td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td>
+                        <strong>
+                            {{getPercShotsSum(homePlayers)}}
+                        </strong>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+
+            <table class="table table-bordered">
+                <strong>
+                    {{selectedEvent.awayTeamName}}
+                </strong>
+                <br>
+                <br>
+                <thead>
+                <tr>
+                    <th width="5%">Starter</th>
+                    <th width="5%">Position</th>
+                    <th width="10%">Name</th>
+                    <th ng-hide="hideInputs">Pmin</th>
+                    <th ng-hide="hideInputs">Average Minutes</th>
+                    <th ng-hide="hideInputs">Cum Perc Attempted Per Minute</th>
+                    <th ng-hide="hideInputs">Last Year Two Perc</th>
+                    <th ng-hide="hideInputs">Cum Two Perc In Season</th>
+                    <th ng-hide="hideInputs">Last Year Three Perc</th>
+                    <th ng-hide="hideInputs">Cum Three Perc In Season</th>
+                    <th ng-hide="hideInputs">Last Year Three Prop</th>
+                    <th ng-hide="hideInputs">Cum Three Prop</th>
+                    <th ng-hide="hideInputs">Cum Ft Made Per Fg Attempted</th>
+                    <th ng-hide="hideInputs">Last Year Ft Perc</th>
+                    <th ng-hide="hideInputs">Cum Ft Perc</th>
+                    <th width="5%">Target Prediction</th>
+                    <th width="5%">Avg Prediction</th>
+                    <th width="5%">Line</th>
+                    <th width="5%">Over Prob</th>
+                    <th width="5%">Under Or Equal Price</th>
+                    <th width="5%">Over Price</th>
+                    <th width="5%">Three Points Line</th>
+                    <th width="5%">Over Prob</th>
+                    <th width="5%">Over Price</th>
+                    <th width="5%">Under Or Equal Price</th>
+                    <th width="5%">Generate Prices</th>
+                </tr>
+                </thead>
+                <tbody ng-repeat="player in awayPlayers">
+                <tr>
+                    <td>
+                        <select ng-model="player.isStarter">
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </td>
+                    <td>
+                        {{player.position}}
+                    </td>
+                    <td>
+                        {{player.name}}
+                    </td>
+
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.pmin" step="0.5">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.averageMinutes" step="0.01">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.cumPercAttemptedPerMinute" step="0.0001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.lastYearTwoPerc" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.cumTwoPerc" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.lastYearThreePerc" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.cumThreePerc" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.lastYearThreeProp" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.cumThreeProp" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.cumFtMadePerFgAttempted" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.lastYearFtPerc" step="0.001">
+                    </td>
+                    <td ng-hide="hideInputs">
+                        <input type="number" ng-model="player.cumFtPerc" step="0.001">
+                    </td>
+                    <td>
+                        <input type="number" ng-model="player.targetAverage" step="0.001">
+                    </td>
+                    <td>
+                        {{getPlayerAverage(player)}}
+                    </td>
+                    <td>
+                        <input type="number" ng-model="player.line" step="0.5" max="50.5" , min="0.5">
+                    </td>
+                    <td>
+                        {{roundNumber(getOverProbForPlayer(player))}}
+                    </td>
+                    <td>
+                        {{roundNumber(1 / (1 - getOverProbForPlayer(player)))}}
+                    </td>
+                    `
+                    <td>
+                        {{roundNumber(1 / getOverProbForPlayer(player))}}
+                    </td>
+                    <td>
+                        <input type="number" ng-model="player.threePointsLine" step="0.5" max="50.5" , min="0.5">
+                    </td>
+                    <td>
+                        {{roundNumber(getThreePointersOverProbForPlayer(player))}}
+                    </td>
+                    <td>
+                        {{roundNumber(1 / getThreePointersOverProbForPlayer(player))}}
+                    </td>
+                    <td>
+                        {{roundNumber(1 / (1 - getThreePointersOverProbForPlayer(player)))}}
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="player.generatePrices">
+                    </td>
+                    <td>
+                        <button id="hideShowInputs2" ng-click="generatePredictionsForPlayer(player)"
+                                ng-class="'btn btn-primary'">
+                            Generate predictions
+                        </button>
+                    </td>
+
+                </tr>
+
+                </tbody>
+                <tbody>
+                <tr>
+
+                    <td>
+
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <strong>
+                            {{getExpPminSum(awayPlayers)}}
+                        </strong>
+                    </td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td ng-hide="hideInputs"></td>
+                    <td>
+                        <strong>
+                            {{getPercShotsSum(awayPlayers)}}
+                        </strong>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

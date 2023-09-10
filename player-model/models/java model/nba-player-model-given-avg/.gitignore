@@ -1,0 +1,18 @@
+*.class
+
+# Package Files #
+target
+*.jar
+*.war
+*.ear
+
+# IDE Files #
+*.iml
+*.idea
+
+*.settings
+*.project
+*.classpath
+*.log
+
+tag-release.sh
