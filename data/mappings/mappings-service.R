@@ -50,6 +50,7 @@ loadCsvForDay <- function(fileDir){
     colnames(dayCsv) = colNames
     dayCsv$date = str_remove_all(fileDir, pattern = "C:/Users/Antonio/Documents/NBA/data/rotowire/rotowire-nba-projections-|.csv")
     dayCsv$name = dayCsv$NAME
+    dayCsv = dayCsv[,-which(colnames(dayCsv) == "Team")]
     return(dayCsv)
   }else{
     return(read.csv(fileDir))
@@ -69,7 +70,11 @@ mapMinutesForSeasonForRotogrinders <- function(seasonYear){
   return(mapMinutesForSeason(seasonYear = seasonYear))
 }
 
-mapMinutesForSeason <- function(seasonYear, mappingsFile = "C:/Users/Antonio/Documents/NBA/data/mappings/rotowire-mappings.csv", csvMinPredsDir = "C:\\Users\\Antonio\\Documents\\NBA\\data\\RotoGrinders\\csvs\\", csvPreffix = ""){
+mapMinutesForSeason <- function(seasonYear, 
+                                mappingsFile = "C:/Users/Antonio/Documents/NBA/data/mappings/rotowire-mappings.csv", 
+                                csvMinPredsDir = "C:\\Users\\Antonio\\Documents\\NBA\\data\\RotoGrinders\\mapped slate\\", 
+                                csvPreffix = ""){
+  
   boxscores <- getPlayersForYear(seasonYear)
   games <- getMatchesForYear(seasonYear)
   boxscores <- merge(boxscores, games[c("GameId", "Date")], all.x = T)
@@ -86,6 +91,8 @@ mapMinutesForSeason <- function(seasonYear, mappingsFile = "C:/Users/Antonio/Doc
       fileDate = str_replace(file, csvPreffix, "")
       fileDate= str_replace(fileDate, ".csv", "")
     }else {
+      csvData$name = csvData$playerName
+      csvData <- unique(csvData[c("name", "pmin")])
       fileDate= str_replace(file, ".csv", "")
     }
     
@@ -189,7 +196,7 @@ mapSbrDataToEspn <- function(bx){
   sbrData$prevDate <- sbrData$date - 1
   
   bx = bx[,-which(colnames(bx) == "Date")]
-  odds <- sqldf("SELECT g.GameId, o.* FROM bx g
+  odds <- sqldf("SELECT g.GameId, g.AwayTeam, g.HomeTeam, o.* FROM bx g
                LEFT JOIN sbrData o
                ON g.homeTeamSbrName = o.homeTeam AND g.awayTeamSbrName = o.awayTeam
                AND (g.date = o.prevDate)")
@@ -199,7 +206,7 @@ mapSbrDataToEspn <- function(bx){
   bxNotMapped <- subset(bx, bx$GameId %in% notMapped$GameId)
   bxMapped <- subset(bx, !bx$GameId %in% notMapped$GameId) 
   
-  oddsNotMapped <- sqldf("SELECT g.GameId, o.* FROM bxNotMapped g
+  oddsNotMapped <- sqldf("SELECT g.GameId, g.AwayTeam, g.HomeTeam, o.* FROM bxNotMapped g
                           LEFT JOIN sbrData o
                           ON g.homeTeamSbrName = o.homeTeam AND g.awayTeamSbrName = o.awayTeam
                           AND (g.date = o.date)")
@@ -207,8 +214,8 @@ mapSbrDataToEspn <- function(bx){
   odds <- subset(odds, odds$GameId %in% bxMapped$GameId)
   odds <- rbind(odds, oddsNotMapped)
   
-  return(odds[c("GameId", "matchSpread", "totalPoints")])
+  odds <- unique(odds[c("GameId", "AwayTeam", "HomeTeam", "matchSpread", "totalPoints")])
+  return(odds)
 }
 
-bx = getMatchesForYear(2023)
-oddsToBx <- mapSbrDataToEspn(bx)
+
