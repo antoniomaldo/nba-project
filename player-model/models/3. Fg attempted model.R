@@ -2,14 +2,22 @@ library(h2o)
 library(sqldf)
 library(arm)
 
-source("C:\\Users\\Antonio\\Documents\\NBA\\player-model\\models\\Model Utils.R")
+source("C:\\Users\\Antonio\\Documents\\nba-project\\player-model\\models\\Model Utils.R")
 
-allPlayers <- readRDS(file = "C:\\Users\\Antonio\\Documents\\NBA\\player-model\\models\\allPlayersOdds.rds")
+allPlayers <- readRDS(file = "C:\\Users\\Antonio\\Documents\\nba-project\\player-model\\models\\allPlayers.rds")
+minPreds <- readRDS(file = "C:\\Users\\Antonio\\Documents\\nba-project\\player-model\\models\\minutePredictions.rds")
 
-h2o.init()
 
-#modelData <- subset(allPlayers, allPlayers$gamesPlayedSeason > 10 & allPlayers$Min > 0 & !is.na(allPlayers$ownExpPoints))
-modelData <- allPlayers
+minPreds <- merge(minPreds, allPlayers, by = c("GameId", "PlayerId"), all.x = T)
+minPreds$id <- paste0(minPreds$GameId, "-", minPreds$Team)
+
+sumGrindersPreds <- aggregate(grindersMin ~ id, minPreds, sum)
+
+gamesToUse <- subset(sumGrindersPreds$id, abs(sumGrindersPreds$grindersMin - 240) <= 3)
+
+modelData <- subset(minPreds, minPreds$id %in% gamesToUse)
+modelData <- subset(modelData, !is.na(modelData$grindersMin))
+modelData <- subset(modelData, modelData$played == 1)
 modelData$ownExpPointsDiff = modelData$ownExpPoints - modelData$oppExpPoints
 modelData$ownExpPointsDiff2 = modelData$ownExpPointsDiff ^ 2
 
@@ -17,14 +25,33 @@ modelData$gamesPlayedSeason2 <- modelData$gamesPlayedSeason ^ 2
 modelData$gamesPlayedSeason3 <- pmax(0, modelData$gamesPlayedSeason - 30)
 modelData$seasonYearFactor <- as.factor(modelData$seasonYear)
 modelData$StarterFactor <- as.factor(modelData$Starter)
+modelData$cumFgAttemptedPerGameAndMinute <- modelData$cumFgAttemptedPerGame / modelData$averageMinutes
 
-playersInGame <- aggregate(Min ~ GameId + Team, modelData, length)
+modelData$pmin <- modelData$grindersMin
+modelData$cumFgAttemptedPerGame <- ifelse(is.na(modelData$cumFgAttemptedPerGame), modelData$lastYearFgAttemptedPerGame, modelData$cumFgAttemptedPerGame)
+modelData <- subset(modelData, !is.na(modelData$pmin) & modelData$pmin > 0)
+
+#handle Na values for cumFgAttemptedPerGame
+
+modelData$fgExp <- ifelse(is.na(modelData$cumFgAttemptedPerGame), modelData$lastYearFgAttemptedPerGame, modelData$cumFgAttemptedPerGame)
+modelData$averageMinutes2 <- ifelse(is.na(modelData$averageMinutes), modelData$pmin, modelData$averageMinutes)
+
+teamFgExp <- aggregate(fgExp ~ GameId + Team, modelData, sum)
+teamFgExp <- merge(teamFgExp, aggregate(averageMinutes2 ~ GameId + Team, modelData, sum))
+
+colnames(teamFgExp)[3] <- "teamFgExp"
+colnames(teamFgExp)[4] <- "teamAvgMinutest"
+
+modelData <- merge(modelData, teamFgExp, by = c("GameId", "Team"))
+
+playersInGame <- aggregate(Min.x ~ GameId + Team, modelData, length)
 colnames(playersInGame)[3] <- "numbPlayers"
 modelData <- merge(modelData, playersInGame, by = c("GameId", "Team"))
 
-modelData <- subset(modelData, !is.na(modelData$pmin) & modelData$pmin > 0)
 
-trainIds <- getTrainIds(modelData)
+trainIds <- unique(modelData$GameId[modelData$seasonYear<2022])
+
+h2o.init()
 
 modelData$pminOver30 <- pmax(0, modelData$pmin - 30)
 trainDataGBM <- subset(modelData, modelData$GameId %in% trainIds)
@@ -35,32 +62,29 @@ testDataH2O <- as.h2o(testDataGBM)
 
 modelDataH2o <- as.h2o(modelData)
 
-modelGBM = h2o.gbm(x = c("Min",
+modelGBM = h2o.gbm(x = c("pmin",
                          "averageMinutes",
-                         "cumPercAttemptedPerMinute",
                          "ownExpPoints",
-                         "oppExpPoints",
                          "cumFgAttemptedPerGame",
-                         "lastGameAttemptedPerMin",
-                      #   "teamGameNumber",
-                         "lastYearFgAttemptedPerGame"
-                     # "pminOver30",
-                    #  "gamesPlayedSeason"
-                         
-                         ), y = "Fg.Attempted",
-                   
-                   training_frame = modelDataH2o,
-                   model_id = "PercAttempted", 
-                   seed = 12, 
-                   nfolds = 10, 
-                   keep_cross_validation_predictions = TRUE, 
-                   fold_assignment = "Modulo", 
-                   distribution = "poisson",
-                   max_depth = 5,
-                   min_rows = 500,
-                   ntrees = 500)
-
-
+                         "cumFgAttemptedPerGameAndMinute",
+                         "oppExpPoints",
+                         "lastYearFgAttemptedPerGame",
+                         #"teamFgExp",
+                         "teamAvgMinutest",
+                         "seasonYearFactor"
+                    ), y = "Fg.Attempted",
+                    
+                    training_frame = modelDataH2o,
+                    model_id = "FgAttemptedModel", 
+                    seed = 12, 
+                    nfolds = 10, 
+                    keep_cross_validation_predictions = TRUE, 
+                    fold_assignment = "Modulo", 
+                    distribution = "poisson",
+                    max_depth = 5,
+                    min_rows = 200,
+                    ntrees = 500)
+                    
 h2o.performance(modelGBM, xval = T) #Mean residual deviance 0.7798013
 h2o.performance(modelGBM, xval = F) #Mean residual deviance 0.7790562
 
@@ -73,6 +97,12 @@ testDataGBM$residGBM <- testDataGBM$Fg.Attempted - testDataGBM$predictionsGBM
 mean(testDataGBM$residGBM)
 
 binnedplot(testDataGBM$predictionsGBM, testDataGBM$residGBM)
+binnedplot(testDataGBM$predictionsGBM[testDataGBM$ownExpPoints > 112], testDataGBM$residGBM[testDataGBM$ownExpPoints > 112])
+binnedplot(testDataGBM$predictionsGBM[testDataGBM$ownExpPoints < 112], testDataGBM$residGBM[testDataGBM$ownExpPoints < 112])
+binnedplot(testDataGBM$teamFgExp[abs(testDataGBM$teamFgExp - 100) <= 50], testDataGBM$residGBM[abs(testDataGBM$teamFgExp - 100) <= 50])
+binnedplot(testDataGBM$predictionsGBM[abs(testDataGBM$teamFgExp - 120) <= 20], 
+           testDataGBM$residGBM[abs(testDataGBM$teamFgExp - 120) <= 20])
+
 binnedplot(testDataGBM$Min, testDataGBM$residGBM)
 binnedplot(testDataGBM$pmin[!is.na(testDataGBM$pmin)], testDataGBM$residGBM[!is.na(testDataGBM$pmin)])
 binnedplot(testDataGBM$predictionsGBM[!is.na(testDataGBM$pmin)], testDataGBM$residGBM[!is.na(testDataGBM$pmin)])

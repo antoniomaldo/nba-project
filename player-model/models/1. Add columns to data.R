@@ -1,23 +1,48 @@
 library(sqldf)
 library(arm)
 library(stringr)
-source("C:\\Users\\Antonio\\Documents\\NBA\\data\\RotoGrinders\\Utils.R")
+library(zoo)
+
+source("C:\\Users\\Antonio\\Documents\\nba-project\\data\\utils\\Utils.R")
+source("C:\\Users\\Antonio\\Documents\\nba-project\\data\\mappings\\mappings-service.R")
 
 boxscores <-  getPlayersForYear(2018)
 boxscores <- rbind(boxscores, getPlayersForYear(2019))
 boxscores <- rbind(boxscores, getPlayersForYear(2020))
 boxscores <- rbind(boxscores, getPlayersForYear(2021))
 boxscores <- rbind(boxscores, getPlayersForYear(2022))
+boxscores <- rbind(boxscores, getPlayersForYear(2023))
 
 games <- getMatchesForYear(2018)
 games <- rbind(games, getMatchesForYear(2019))
 games <- rbind(games, getMatchesForYear(2020))
 games <- rbind(games, getMatchesForYear(2021))
 games <- rbind(games, getMatchesForYear(2022))
+games <- rbind(games, getMatchesForYear(2023))
 
-allPlayers = boxscores #remove this
+#Remove all stars games
+
+teams <- data.frame(table(c(games$HomeTeam, games$AwayTeam)))
+teamsToRemove <- subset(teams$Var1, teams$Freq < 100)
+games <- subset(games, !games$HomeTeam %in% teamsToRemove)
+boxscores <- subset(boxscores, !boxscores$Team %in% teamsToRemove)
+
+# Given played data
+
+#allPlayers = subset(boxscores, boxscores$Min > 0) #remove this
+allPlayers <- boxscores
+
+allPlayers$played <- 1 * (allPlayers$Min > 0)
+
+numberPlayersPlayed <- aggregate(played ~ GameId + Team, allPlayers, sum)
+gamesToRemove <- subset(numberPlayersPlayed$GameId, numberPlayersPlayed$played < 5)
+
+allPlayers <- subset(allPlayers, !allPlayers$GameId %in% gamesToRemove)
 allPlayers <- allPlayers[order(allPlayers$PlayerId, allPlayers$seasonYear, allPlayers$GameId),]
-allPlayers$gamesPlayedSeason <-  unlist(aggregate(Min ~ seasonYear + PlayerId, allPlayers, function(x) {1:length(x)})$Min)
+
+allPlayers$gamesPlayedSeason <-  unlist(aggregate(played ~ seasonYear + PlayerId, allPlayers, function(x) {cumsum(c(0,x[-length(x)]))})$played)
+
+View(allPlayers[c("seasonYear", "GameId", "Name", "Min", "played", "gamesPlayedSeason")])
 
 #Add cumulative columns
 allPlayers <- allPlayers[order(allPlayers$PlayerId, allPlayers$seasonYear, allPlayers$GameId),]
@@ -40,11 +65,14 @@ allPlayers$cumMin <- unlist(aggregate(Min ~ seasonYear + PlayerId, allPlayers, f
 allPlayers$cumSetOfFts <- unlist(aggregate(setOfFts ~ seasonYear + PlayerId, allPlayers, function(x) {cumsum(c(0, x[-length(x)]))})$setOfFts)
 allPlayers$cumExtraFt <- unlist(aggregate(extraFt ~ seasonYear + PlayerId, allPlayers, function(x) {cumsum(c(0, x[-length(x)]))})$extraFt)
 
+View(allPlayers[c("seasonYear", "GameId", "Name", "Min", "played", "gamesPlayedSeason", "Three.Attempted", "cumThreeAttempted")])
+
 #Last season averages
-lastYear <- subset(allPlayers, allPlayers$seasonYear < 2022)
+lastYear <- subset(allPlayers, allPlayers$seasonYear < max(allPlayers$seasonYear))
 colnames(lastYear) <- str_replace(colnames(lastYear),pattern = "\\.","_")
+
 agg <- sqldf("SELECT seasonYear, PlayerId, Name, 
-             COUNT(Min) AS LastYearNumbGames,
+             SUM(played) AS LastYearNumbGames,
              SUM(Min) AS LastYearMin, 
              SUM(Three_Made) AS LastYearThreeMade, SUM(Three_Attempted) AS LastYearThreeAttempted,
              SUM(Fg_Made) AS LastYearFgMade, SUM(Fg_Attempted) AS LastYearFgAttempted,
@@ -94,16 +122,30 @@ allPlayers <- sqldf("SELECT t1.*, t2.Fg_Attempted as teamTotalAttempted
 
 allPlayers <- allPlayers[order(allPlayers$PlayerId, allPlayers$seasonYear, allPlayers$GameId),]
 
-allPlayers$percAttempted <- allPlayers$Fg.Attempted / allPlayers$teamTotalAttempted
-allPlayers$percAttemptedPerMin <- allPlayers$percAttempted / allPlayers$Min
+allPlayers$percAttempted <- ifelse(allPlayers$played == 1, allPlayers$Fg.Attempted / allPlayers$teamTotalAttempted, NA)
+allPlayers$percAttemptedPerMin <- ifelse(allPlayers$played == 1, allPlayers$percAttempted / allPlayers$Min, NA)
+allPlayers$teamTotalAttempted <- ifelse(allPlayers$played == 1, allPlayers$teamTotalAttempted, 0)
+
+View(allPlayers[c("seasonYear", "GameId", "Name", "Min", "played", "gamesPlayedSeason", "teamTotalAttempted", "percAttempted")])
+
 allPlayers <- allPlayers[order(allPlayers$PlayerId, allPlayers$seasonYear, allPlayers$GameId),]
 allPlayers$teamAttempted <-  unlist(aggregate(teamTotalAttempted ~ seasonYear + PlayerId, allPlayers, function(x) {cumsum(c(0, x[-length(x)]))})$teamTotalAttempted)
 allPlayers$cumPercAttempted <- allPlayers$cumFgAttempted / allPlayers$teamAttempted
 allPlayers$averageMinutes <- allPlayers$cumMin / allPlayers$gamesPlayedSeason
 allPlayers$cumPercAttemptedPerMinute <- allPlayers$cumPercAttempted / allPlayers$averageMinutes
 
+View(allPlayers[c("seasonYear", "GameId", "Name", "Min", "played", "gamesPlayedSeason", "teamTotalAttempted", "percAttempted", "teamAttempted", "cumPercAttempted", "averageMinutes", "cumPercAttemptedPerMinute")])
+
+allPlayers$percAttempted <- na.locf(allPlayers$percAttempted)
 allPlayers$lastGameAttempted <- unlist(aggregate(percAttempted ~ seasonYear + PlayerId, allPlayers, function(x) {(c(0, x[-length(x)]))})$percAttempted)
 allPlayers$lastGameMin <- unlist(aggregate(Min ~ seasonYear + PlayerId, allPlayers, function(x) {(c(0, x[-length(x)]))})$Min)
+
+allPlayers$lastGameMin[allPlayers$gamesPlayedSeason == 0] <- 0
+allPlayers$lastGameMin[allPlayers$lastGameMin == 0 & allPlayers$gamesPlayedSeason > 0] <- NA
+allPlayers$lastGameMin <- na.locf(allPlayers$lastGameMin)
+
+View(allPlayers[c("seasonYear", "GameId", "Name", "Min", "played", "gamesPlayedSeason", "Fg.Attempted", "teamTotalAttempted",  "percAttempted", "lastGameAttempted", "lastGameMin")])
+
 allPlayers$lastGameAttemptedPerMin <- allPlayers$lastGameAttempted / allPlayers$lastGameMin 
 
 allPlayers$cumThreePerc <- allPlayers$cumThreeMade / allPlayers$cumThreeAttempted
@@ -132,10 +174,13 @@ allPlayers$lastYearSetOfFtsPerFg <- allPlayers$LastYearSetOfFts / allPlayers$Las
 allPlayers$lastYearFtPerc <- allPlayers$LastYearFtMade / allPlayers$LastYearFTAttempted
 allPlayers$cumFtPerc <- allPlayers$cumFTMade / allPlayers$cumFTAttempted
 
-allPlayers$cumFgAttemptedPerGame = allPlayers$cumFgAttempted / (allPlayers$gamesPlayedSeason - 1)
+allPlayers$cumFgAttemptedPerGame = allPlayers$cumFgAttempted / (allPlayers$gamesPlayedSeason)
 
 allPlayers$lastYearFgAttemptedPerGame = allPlayers$LastYearFgAttempted / allPlayers$LastYearNumbGames
 allPlayers$lastYearFgMadePerGame = allPlayers$LastYearFgMade / allPlayers$LastYearNumbGames
+
+View(allPlayers[c("seasonYear", "GameId", "Name", "Min", "played", "gamesPlayedSeason", 
+                  "cumThreePerc", "threePerc",  "lastYearThreePerc", "cumThreeMade", "cumThreeAttempted", "Three.Made", "Three.Attempted")])
 
 #
 
@@ -145,5 +190,4 @@ teamGames$teamGameNumber <-  unlist(aggregate(GameId ~ seasonYear + Team, teamGa
 
 allPlayers <- merge(allPlayers, teamGames, by = c("seasonYear", "GameId", "Team"), all.x = T)
 
-saveRDS(allPlayers, file = "C:\\Users\\Antonio\\Documents\\NBA\\player-model\\models\\allPlayers.rds")
-
+saveRDS(allPlayers, file = "C:\\Users\\Antonio\\Documents\\nba-project\\player-model\\models\\allPlayers.rds")
