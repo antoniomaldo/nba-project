@@ -174,12 +174,12 @@ allPlayers$lastYearSetOfFtsPerFg <- allPlayers$LastYearSetOfFts / allPlayers$Las
 allPlayers$lastYearFtPerc <- allPlayers$LastYearFtMade / allPlayers$LastYearFTAttempted
 allPlayers$cumFtPerc <- allPlayers$cumFTMade / allPlayers$cumFTAttempted
 
-allPlayers$cumFgAttemptedPerGame = allPlayers$cumFgAttempted / (allPlayers$gamesPlayedSeason)
+allPlayers$cumFgAttemptedPerGame = ifelse(allPlayers$gamesPlayedSeason == 0, NA, allPlayers$cumFgAttempted / (allPlayers$gamesPlayedSeason))
 
 allPlayers$lastYearFgAttemptedPerGame = allPlayers$LastYearFgAttempted / allPlayers$LastYearNumbGames
 allPlayers$lastYearFgMadePerGame = allPlayers$LastYearFgMade / allPlayers$LastYearNumbGames
 
-View(allPlayers[c("seasonYear", "GameId", "Name", "Min", "played", "gamesPlayedSeason", 
+View(allPlayers[c("seasonYear", "GameId", "Name", "Min", "played", "gamesPlayedSeason", "Fg.Attempted", "cumFgAttempted", "cumFgAttemptedPerGame",
                   "cumThreePerc", "threePerc",  "lastYearThreePerc", "cumThreeMade", "cumThreeAttempted", "Three.Made", "Three.Attempted")])
 
 #

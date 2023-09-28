@@ -7,7 +7,7 @@ import hex.genmodel.easy.exception.PredictException;
 public class TwoPointsPercModelNew extends H2OModel {
 
     public TwoPointsPercModelNew() {
-        super("twoPointsPercNew.zip");
+         super("twoPointsPercNew.zip");
     }
 
     public double getTwoPointsPercentage(double teamExpPoints,

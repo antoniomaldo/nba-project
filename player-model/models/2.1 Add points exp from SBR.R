@@ -23,4 +23,4 @@ allData$ownExpPoints <- ifelse(allData$Team == allData$HomeTeam, allData$homeExp
 allData$oppExpPoints <- ifelse(allData$Team != allData$HomeTeam, allData$homeExp, allData$awayExp)
 
 
-saveRDS(allData, "C:\\Users\\Antonio\\Documents\\nba-project\\player-model\\models\\allPlayers.rds")
+saveRDS(allData, "C:\\Users\\Antonio\\Documents\\nba-project\\player-model\\models\\allPlayersWithOdds.rds")

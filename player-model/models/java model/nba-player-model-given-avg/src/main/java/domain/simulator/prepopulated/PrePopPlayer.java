@@ -1,8 +1,7 @@
 package domain.simulator.prepopulated;
 
 import domain.Player;
-import domain.models.playerpoints.ThreePropModelNew;
-import domain.simulator.TeamSimulator;
+import domain.models.PlayingModel;
 import hex.genmodel.easy.exception.PredictException;
 import org.apache.commons.math3.util.Pair;
 
@@ -16,7 +15,7 @@ public class PrePopPlayer {
 
     private final String name;
     private final String team;
-
+    private final double playProb;
     private final double baseFgAttemptedPred;
 
     private final double[] threePropOfShots = new double[41];
@@ -27,10 +26,11 @@ public class PrePopPlayer {
     private final Map<Pair<Integer, Integer>, Double> ftPercPreds = new HashMap<>();
 
     private double normFgAttempted;
-    public PrePopPlayer(Player player, double ownExpPoints, double oppExpPoints, double teamFgExp, double teamFtExp, double teamAvgMinutest, double percFactor) throws PredictException {
+    public PrePopPlayer(Player player, double ownExpPoints, double oppExpPoints, double teamFgExp, double teamFtExp, double teamAvgMinutest, double percFactor, double teamPmin) throws PredictException {
         this.name = player.getName();
         this.team = player.getTeam();
-        this.baseFgAttemptedPred = FG_ATTEMPTED_MODEL.getFgAttempted(ownExpPoints, oppExpPoints, player.getPmin(), player.getAverageMinutes(), player.getLastYearFgAttemptedPerGame(), player.getCumFgAttemptedPerGame() == null ? player.getLastYearFgAttemptedPerGame() : player.getCumFgAttemptedPerGame(), teamFgExp, teamAvgMinutest);
+        this.playProb = PlayingModel.probabilityOfPlayingForRoto(player.getPmin());
+        this.baseFgAttemptedPred = FG_ATTEMPTED_MODEL.getFgAttempted(ownExpPoints, oppExpPoints, player.getPmin(), player.getAverageMinutes(), player.getLastYearFgAttemptedPerGame(), player.getCumFgAttemptedPerGame() == null ? player.getLastYearFgAttemptedPerGame() : player.getCumFgAttemptedPerGame());
 
         for (int fgAttempted = 0; fgAttempted <= 40; fgAttempted++) {
             this.threePropOfShots[fgAttempted] = THREE_PROP_MODEL_NEW.getThreePropOfShots(player.getLastYearThreeProp(), player.getCumThreeProp(), fgAttempted, player.getCumTwoPerc(), player.getCumThreePerc(), ownExpPoints, this.baseFgAttemptedPred);
@@ -94,5 +94,9 @@ public class PrePopPlayer {
 
     public double getNormFgAttempted() {
         return normFgAttempted;
+    }
+
+    public double getPlayProb(){
+        return this.playProb;
     }
 }

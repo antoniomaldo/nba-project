@@ -3,6 +3,7 @@ package domain.simulator;
 import domain.Player;
 
 import domain.Team;
+import domain.models.PlayingModel;
 import domain.models.playerpoints.MissingPointsExpModel;
 import domain.simulator.fgdistribution.FgDistribution;
 import domain.simulator.fgdistribution.FgDistributionModel;
@@ -45,32 +46,34 @@ public class TeamSimulator {
 //        }
 
         teamModelOutput = simulateTeamForFgMultiplier(prePopPlayerList, percFactor);
-//        return transformToMap(teamModelOutput);
-        double upperMultiplier;
-        double lowerMultiplier;
-
-        if (teamSimExp > teamExpPointsPred) {
-            upperMultiplier = 0;
-            lowerMultiplier = -0.2;
-        } else {
-            upperMultiplier = 0.2;
-            lowerMultiplier = 0;
-        }
-
-        while (Math.abs(teamSimExp - teamExpPointsPred) >= TOLERANCE) {
-            double midPoint = (upperMultiplier + lowerMultiplier) / 2d;
-            System.out.println("Simulating for midpoint ->" + midPoint);
-            teamModelOutput = simulateTeamForFgMultiplier(prePopPlayerList, midPoint);
-            teamSimExp = getTeamSimExp(teamModelOutput);
-
-            if (teamSimExp > teamExpPointsPred) {
-                upperMultiplier = midPoint;
-            } else {
-                lowerMultiplier = midPoint;
-            }
-        }
-
         return transformToMap(teamModelOutput);
+
+//
+//        double upperMultiplier;
+//        double lowerMultiplier;
+//
+//        if (teamSimExp > teamExpPointsPred) {
+//            upperMultiplier = 0;
+//            lowerMultiplier = -0.2;
+//        } else {
+//            upperMultiplier = 0.2;
+//            lowerMultiplier = 0;
+//        }
+//
+//        while (Math.abs(teamSimExp - teamExpPointsPred) >= TOLERANCE) {
+//            double midPoint = (upperMultiplier + lowerMultiplier) / 2d;
+//            System.out.println("Simulating for midpoint ->" + midPoint);
+//            teamModelOutput = simulateTeamForFgMultiplier(prePopPlayerList, midPoint);
+//            teamSimExp = getTeamSimExp(teamModelOutput);
+//
+//            if (teamSimExp > teamExpPointsPred) {
+//                upperMultiplier = midPoint;
+//            } else {
+//                lowerMultiplier = midPoint;
+//            }
+//        }
+//
+//        return transformToMap(teamModelOutput);
     }
 
     private static Map<String, PlayerModelOutput> transformToMap(List<PlayerModelOutput> list) {
@@ -87,7 +90,7 @@ public class TeamSimulator {
 //        FieldGoalNormalizer.normalize(prePopPlayerList, fgMultiplier);
         for (PrePopPlayer player : prePopPlayerList) {
             List<PlayerSimulationOutcome> playerSimulationOutcomes = simulateForFgAttemptedMultiplier(player, fgMultiplier, 40000);
-            PlayerModelOutput playerModelOutput = new PlayerModelOutput(player.getName(), player.getTeam(), playerSimulationOutcomes, player.getBaseFgAttemptedPred(), fgMultiplier);
+            PlayerModelOutput playerModelOutput = new PlayerModelOutput(player.getName(), player.getTeam(), playerSimulationOutcomes, player.getBaseFgAttemptedPred(), fgMultiplier, player.getPlayProb());
             teamModelOutput.add(playerModelOutput);
         }
         return teamModelOutput;
@@ -103,9 +106,10 @@ public class TeamSimulator {
                 mapToDouble(p -> p.getAverageMinutes2()).sum();
 
         double teamFtExp = team.stream().filter(p -> p.getFtExp() != null).mapToDouble(p -> p.getFtExp()).sum();
+        double teamPmin = team.stream().mapToDouble(p->p.getPmin()).sum();
 
         for (Player player : team) {
-            prePopPlayerList.add(new PrePopPlayer(player, ownPointsExp, oppPointsExp, teamFgExp, teamFtExp, teamAvgMinutest, percFactor));
+            prePopPlayerList.add(new PrePopPlayer(player, ownPointsExp, oppPointsExp, teamFgExp, teamFtExp, teamAvgMinutest, percFactor, teamPmin));
         }
         return prePopPlayerList;
     }
@@ -131,9 +135,6 @@ public class TeamSimulator {
         int numbOfThrees = simuNumbThrees(fgAttempted, threePropOfShots);
         double twoPerc = fgAttempted > 0 ? player.getTwoPercGivenFgs(fgAttempted, numbOfThrees) : 0;
         double threePerc = fgAttempted > 0 ? player.getThreePercGivenFgs(fgAttempted, numbOfThrees) : 0;
-
-        twoPerc = twoPerc +  1.5 * fgMultiplier;
-        threePerc = threePerc + 2 * fgMultiplier;
 
         double setOfFtsPred = player.getSetOfFtsPred()[fgAttempted];
 
@@ -179,6 +180,6 @@ public class TeamSimulator {
     }
 
     private static double getTeamSimExp(List<PlayerModelOutput> list) {
-        return list.stream().mapToDouble(p -> p.getPointsAvg()).sum();
+        return list.stream().mapToDouble(p -> p.getPointsAvg()*(p.getPlayProb())).sum();
     }
 }

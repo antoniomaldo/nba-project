@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class GetGameIdPaths {
 
-    public static final String CSV_INPUT_LOCATION = "C:\\Users\\Antonio\\Documents\\NBA\\player-model\\models\\Given points line\\backtest\\input";
+    public static final String CSV_INPUT_LOCATION = "C:\\Users\\Antonio\\Documents\\nba-project\\player-model\\models\\backtest\\input_rotowire\\";
 
     public static List<String> get(){
         File file = new File(CSV_INPUT_LOCATION);

@@ -21,7 +21,7 @@ public class PlayerSimulator {
 //    public static final ThreePropModel THREE_PROP_MODEL = new ThreePropModel();
     public static final ThreePropModelNew THREE_PROP_MODEL_NEW = new ThreePropModelNew();
 
-    public static final FgAttemptedModel FG_ATTEMPTED_MODEL = new FgAttemptedModel();
+    public static final FgAttemptedModelRotoWire FG_ATTEMPTED_MODEL = new FgAttemptedModelRotoWire();
     public static final SetOfFtsModel SET_OF_FTS_MODEL = new SetOfFtsModel();
     public static final SetOfFtsZeroFgModel SET_OF_FTS_MODEL_ZERO_FG = new SetOfFtsZeroFgModel();
     public static final ExtraFtModel EXTRA_FT_MODEL = new ExtraFtModel();

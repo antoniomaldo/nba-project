@@ -10,6 +10,7 @@ public class PlayerSimulationOutcome {
     private final int ftAttempted;
     private final int zeroFtAttempted;
     private final int zeroFgAttempted;
+    private double playProb = 1;
 
     public PlayerSimulationOutcome(int points, int twoPointers, int twoPointersAttempted, int threePointers, int threePointersAttempted, int ftScored, int ftAttempted, int zeroFgAttempted, int zeroFtAttempted) {
         this.points = points;
@@ -57,5 +58,13 @@ public class PlayerSimulationOutcome {
 
     public int getZeroFgAttempted() {
         return zeroFgAttempted;
+    }
+
+    public double getPlayProb() {
+        return playProb;
+    }
+
+    public void setPlayProb(double playProb) {
+        this.playProb = playProb;
     }
 }

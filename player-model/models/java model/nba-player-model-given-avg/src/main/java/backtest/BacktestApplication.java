@@ -17,7 +17,7 @@ import static backtest.GetGameIdPaths.CSV_INPUT_LOCATION;
 
 public class BacktestApplication {
 
-    public static final String CSV_OUTPUT_LOCATION = "C:\\Users\\Antonio\\Documents\\NBA\\player-model\\models\\Given points line\\backtest\\normalized\\";
+    public static final String CSV_OUTPUT_LOCATION = "C:\\Users\\Antonio\\Documents\\nba-project\\player-model\\models\\backtest\\not_normalized\\";
 
     public static void main(String[] args) throws PredictException, IOException {
         List<String> gameIdPaths = GetGameIdPaths.get();
@@ -25,14 +25,14 @@ public class BacktestApplication {
         boolean shouldSimulate = false;
         for(String gameIdPath : gameIdPaths){
             counter++;
-            if(Integer.parseInt(gameIdPath.replace(CSV_INPUT_LOCATION, "").replace("\\Game","").replace(".csv", "")) >= 401266795){
+            if(Integer.parseInt(gameIdPath.replace(CSV_INPUT_LOCATION, "").replace("\\Game","").replace(".csv", "")) == 401468240){
                 shouldSimulate = true;
             }
             if(shouldSimulate) {
 
 
                 String gameId = gameIdPath.replace(CSV_INPUT_LOCATION, "");
-                System.out.println(gameId);
+                System.out.println(gameIdPath);
                 List<PlayerRequest> players = LoadDataForGameId.load(gameIdPath);
 
                 if(players != null) {
@@ -59,7 +59,7 @@ public class BacktestApplication {
 
     private static void writeCsv(Map<String, PlayerModelOutput> playerModelOutputMap, String gameId) throws IOException {
         CSVWriter writer = new CSVWriter(new FileWriter(CSV_OUTPUT_LOCATION + gameId));
-        String[] header = new String[58];
+        String[] header = new String[59];
         header[0] = "rowId";
         header[1] = "pointsAvg";
         header[2] = "fieldGoalAttempted";
@@ -80,6 +80,7 @@ public class BacktestApplication {
         header[55] = "averageFtsAttempted";
         header[56] = "zeroFgProb";
         header[57] = "zeroFtProb";
+        header[58] = "playProb";
 
         writer.writeNext(header);
 
@@ -91,7 +92,7 @@ public class BacktestApplication {
             Map<Integer, Double> pointsMap = playerModelOutput.getPointsMap();
             Map<Integer, Double> threesMap = playerModelOutput.getThreesMap();
 
-            String[] row = new String[58];
+            String[] row = new String[59];
 
             row[0] = rowId;
             row[1] = String.valueOf(pointsAverage);
@@ -125,6 +126,7 @@ public class BacktestApplication {
             row[55] = "" + averageFtsAttempted + "";
             row[56] = "" + playerModelOutput.getZeroFgAttProb() + "";
             row[57] = "" + playerModelOutput.getZeroFtAttProb() + "";
+            row[58] = "" + playerModelOutput.getPlayProb() + "";
 
             writer.writeNext(row);
         }

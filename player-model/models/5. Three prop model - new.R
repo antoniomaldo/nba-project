@@ -2,9 +2,53 @@ library(h2o)
 library(sqldf)
 library(arm)
 
-source("C:\\Users\\Antonio\\Documents\\NBA\\player-model\\models\\Model Utils.R")
+source("C:\\Users\\Antonio\\Documents\\nba-project\\player-model\\models\\Model Utils.R")
 
-modelData <- readRDS(file = "C:\\Users\\Antonio\\Documents\\NBA\\player-model\\models\\modelData.rds")
+modelData <- readRDS(file = "C:\\Users\\Antonio\\Documents\\nba-project\\player-model\\models\\allPlayersWithOdds.rds")
+
+modelData <- subset(modelData, modelData$Fg.Attempted > 0)
+
+
+
+luka <- subset(modelData, modelData$Name == "L. Doncic" & modelData$seasonYear >= 2022)
+mean(luka$threeProp)
+
+luka$staticProp <- mean(luka$threeProp)
+
+luka$prob_1 <- 0
+luka$prob_2 <- 0
+luka$prob_3 <- 0
+luka$prob_4 <- 0
+luka$prob_5 <- 0
+luka$prob_6 <- 0
+luka$prob_7 <- 0
+luka$prob_8 <- 0
+
+for(i in 1:nrow(luka)){
+  probs <- dbinom(1:8, luka$Fg.Attempted[i], luka$staticProp[i])
+  luka$prob_1[i] <- probs[1]
+  luka$prob_2[i] <- probs[2]
+  luka$prob_3[i] <- probs[3]
+  luka$prob_4[i] <- probs[4]
+  luka$prob_5[i] <- probs[5]
+  luka$prob_6[i] <- probs[6]
+  luka$prob_7[i] <- probs[7]
+  luka$prob_8[i] <- probs[8]
+}
+
+
+mean(luka$prob_4)
+mean(luka$Three.Attempted == 4)
+
+
+mean(luka$prob_5)
+mean(luka$Three.Attempted == 5)
+
+mean(luka$prob_6)
+mean(luka$Three.Attempted == 6)
+mean(luka$prob_7)
+mean(luka$Three.Attempted == 7)
+
 
 allData <- data.frame()
 

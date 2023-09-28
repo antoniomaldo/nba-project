@@ -20,8 +20,9 @@ public class PlayerModelOutput {
     private final double fgMultiplier;
     private final double zeroFgAttProb;
     private final double zeroFtAttProb;
+    private final double playProb;
 
-    public PlayerModelOutput(String playerName, String playerTeam, List<PlayerSimulationOutcome> playerSimulationOutcomeList, double fieldGoalAttempted, double fgMultiplier) {
+    public PlayerModelOutput(String playerName, String playerTeam, List<PlayerSimulationOutcome> playerSimulationOutcomeList, double fieldGoalAttempted, double fgMultiplier, double playProb) {
         this.playerName = playerName;
         this.playerTeam = playerTeam;
         this.playerSimulationOutcomeList = playerSimulationOutcomeList;
@@ -37,6 +38,7 @@ public class PlayerModelOutput {
         this.fgMultiplier = fgMultiplier;
         this.zeroFgAttProb = playerSimulationOutcomeList.stream().mapToDouble(p->p.getZeroFgAttempted()).average().getAsDouble();
         this.zeroFtAttProb = playerSimulationOutcomeList.stream().mapToDouble(p->p.getZeroFtAttempted()).average().getAsDouble();
+        this.playProb = playProb;
     }
 
     public String getPlayerName() {
@@ -128,5 +130,9 @@ public class PlayerModelOutput {
 
     public double getZeroFtAttProb() {
         return zeroFtAttProb;
+    }
+
+    public double getPlayProb() {
+        return playProb;
     }
 }

@@ -12,48 +12,61 @@ public class FgAttemptedModel extends H2OModel {
 
 
     public double getFgAttempted(double teamExpPoints,
-                                 double oppExpPoints,
-                                 double minExpected,
-                                 Double averageMinutesInSeason,
-                                 Double lastYearFgAttemptedPerGame,
-                                 Double cumFgAttemptedPerGame,
-                                 double teamFgExp, double teamAvgMinutest) throws PredictException {
-        return getFgAttempted(teamExpPoints, oppExpPoints, minExpected, averageMinutesInSeason, lastYearFgAttemptedPerGame, cumFgAttemptedPerGame, teamFgExp, teamAvgMinutest, "2021");
+                                                              double oppExpPoints,
+                                                              double minExpected,
+                                                              Double averageMinutesInSeason,
+                                                              Double lastYearFgAttemptedPerGame,
+                                                              Double cumFgAttemptedPerGame,
+                                                              double teamFgExp,
+                                 double teamPmin) throws PredictException {
+
+        Double cumFgAttemptedPerGameAndMinute = null;
+
+        if (cumFgAttemptedPerGame != null && averageMinutesInSeason != null && averageMinutesInSeason > 0) {
+            cumFgAttemptedPerGameAndMinute = cumFgAttemptedPerGame / averageMinutesInSeason;
+        }
+
+        double fgExpPerMin = teamFgExp / teamPmin;
+
+        return getFgAttemptedRInputs(minExpected,
+                teamExpPoints,
+                cumFgAttemptedPerGame,
+                cumFgAttemptedPerGameAndMinute,
+                oppExpPoints,
+                lastYearFgAttemptedPerGame,
+                fgExpPerMin);
+
     }
 
-                                 public double getFgAttempted(double teamExpPoints,
-                                 double oppExpPoints,
-                                 double minExpected,
-                                 Double averageMinutesInSeason,
-                                 Double lastYearFgAttemptedPerGame,
+    public double getFgAttemptedRInputs(
+                                 double pmin,
+                                 double ownExpPoints,
                                  Double cumFgAttemptedPerGame,
-                                 double teamFgExp, double teamAvgMinutest, String seasonYearFactor) throws PredictException {
+                                 Double cumFgAttemptedPerGameAndMinute,
+                                 double oppExpPoints,
+                                 Double lastYearFgAttemptedPerGame,
+                                 double fgExpPerMin) throws PredictException {
 
         RowData rowData = new RowData();
 
-        rowData.put("pmin", minExpected);
+        rowData.put("pmin", pmin);
+        rowData.put("ownExpPoints", ownExpPoints);
 
-        if (averageMinutesInSeason != null) {
-            rowData.put("averageMinutes", averageMinutesInSeason);
+        if(cumFgAttemptedPerGame != null) {
+            rowData.put("cumFgAttemptedPerGame", cumFgAttemptedPerGame);
         }
 
-        if (cumFgAttemptedPerGame != null && averageMinutesInSeason != null && averageMinutesInSeason > 0) {
-            rowData.put("cumFgAttemptedPerGameAndMinute", cumFgAttemptedPerGame / averageMinutesInSeason);
+        if(cumFgAttemptedPerGameAndMinute != null){
+            rowData.put("cumFgAttemptedPerGameAndMinute", cumFgAttemptedPerGameAndMinute);
         }
 
-        if (lastYearFgAttemptedPerGame != null) {
+        rowData.put("oppExpPoints", oppExpPoints);
+
+        if(lastYearFgAttemptedPerGame != null) {
             rowData.put("lastYearFgAttemptedPerGame", lastYearFgAttemptedPerGame);
         }
 
-        rowData.put("ownExpPoints", teamExpPoints);
-        rowData.put("oppExpPoints", oppExpPoints);
-        rowData.put("teamFgExp", teamFgExp);
-        rowData.put("teamAvgMinutest", teamAvgMinutest);
-        rowData.put("seasonYearFactor", seasonYearFactor);
-
-        if (cumFgAttemptedPerGame != null) {
-            rowData.put("cumFgAttemptedPerGame", cumFgAttemptedPerGame);
-        }
+        rowData.put("fgExpPerMin", fgExpPerMin);
 
         return getRegressionPrediction(rowData);
     }
